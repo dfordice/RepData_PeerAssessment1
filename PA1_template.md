@@ -1,9 +1,4 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 ### Notes:
 * PA1_template.md and PA1_template.html are in the working directory
@@ -16,7 +11,8 @@ output:
 * Read the csv file into a data frame and dispose of the temporary file
 * Clean up the data frame date column and copy it into a new data frame
 
-```{r}
+
+```r
 temp <- tempfile()
 download.file("https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip", method="curl", temp)
 data <- read.csv(unz(temp, "activity.csv"))
@@ -35,14 +31,31 @@ attach(data1)
 * Report on the mean of the daily step totals
 * Report on the median of the daily step totals
 
-```{r}
+
+```r
 #Calculating the total number of steps taken each day
 stepsBydate <- aggregate(steps ~ date, data1, sum)
 #Creating a histogram of the results
 hist(stepsBydate$steps, main = "Histogram of Steps by Date (NAs ignored)", xlab = "Steps per Day")
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-2-1.png) 
+
+```r
 #Reporting the mean and median of the total steps per day
 mean(stepsBydate$steps)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 median(stepsBydate$steps)
+```
+
+```
+## [1] 10765
 ```
 
 ## What is the average daily activity pattern?
@@ -52,14 +65,31 @@ median(stepsBydate$steps)
 * Calculates *which* 5-minute interval has the highest number of steps, on average
 * Notes the peak value
 
-```{r}
+
+```r
 #Calculate average steps per 5-minute interval averaged across all days
 stepsByinterval <- aggregate(steps ~ interval, data1, mean)
 plot(stepsByinterval$interval, stepsByinterval$steps, type = "l", xlab = "5-min Interval", ylab = "Average Daily Steps", main = "Time Series Plot of Average Daily Steps per 5-Min Interval")
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-3-1.png) 
+
+```r
 #Calculate the 5 min interval in which the highest number of daily steps are taken
 stepsByinterval$interval[which.max(stepsByinterval$steps)]
+```
+
+```
+## [1] 835
+```
+
+```r
 # And note the number of steps
 stepsByinterval$steps[which.max(stepsByinterval$steps)]
+```
+
+```
+## [1] 206.1698
 ```
 
 ## Imputing missing values
@@ -69,9 +99,17 @@ stepsByinterval$steps[which.max(stepsByinterval$steps)]
 * Recalculates the aggregate daily step totals and replots the histogram
 * Reports the mean and median daily step totals
 
-```{r}
+
+```r
 #Total number of NA values in the data set
 sum(is.na(steps))
+```
+
+```
+## [1] 2304
+```
+
+```r
 #index of the na value rows
 ind <- which(is.na(steps), arr.ind = TRUE)
 #Use the stepsByinterval mean to replace the na values
@@ -79,10 +117,25 @@ data1$steps[ind] <- stepsByinterval$steps[match(data1$interval[ind], stepsByinte
 # Recalculate the histogram and mean/median
 stepsBydate <- aggregate(steps ~ date, data1, sum)
 hist(stepsBydate$steps, main="Histogram of Steps by Date (NAs Replaced)", xlab = "Steps per Day")
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-4-1.png) 
+
+```r
 #Reporting the new mean and median of the total steps per day
 mean(stepsBydate$steps)
-median(stepsBydate$steps)
+```
 
+```
+## [1] 10766.19
+```
+
+```r
+median(stepsBydate$steps)
+```
+
+```
+## [1] 10766.19
 ```
 
 ### Here are the observations of the effects of replacing the NAs:
@@ -96,7 +149,8 @@ median(stepsBydate$steps)
 * Aggregates the interval mean for Weekdays, Weekends and then binds the two data frames
 * Plots a time series in two panels using the lattice package to compare Weekdays and Weekends
 
-```{r}
+
+```r
 #Factor the data by weekdays and aggregate by mean of the intervals
 data1$weekday <- factor(weekdays(data1$date)!="Saturday" & weekdays(data1$date) != "Sunday")
 levels(data1$weekday) <- c("Weekends", "Weekdays")
@@ -108,8 +162,9 @@ stepsByint3 <- rbind(stepsByint1, stepsByint2)
 stepsByint3$day <- as.factor(stepsByint3$day)
 library(lattice)
 xyplot(stepsByint3$steps ~ stepsByint3$interval | stepsByint3$day, type = "l", layout = c(1,2), xlab = "Interval", ylab = "Average Daily Steps", main = "Comparison of Weekday vs. Weekend Steps")
-
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png) 
 
 ### Looking at the comparison of the two plots
 * The activity levels still peak in the mornings
